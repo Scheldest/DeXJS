@@ -1,4 +1,4 @@
-name: 9x_RT_22
+name: 9x_RT_24
 
 on:
   workflow_dispatch:
