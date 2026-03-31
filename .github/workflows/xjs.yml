@@ -1,11 +1,11 @@
-name: 9x_RT_24
+name: 9x_RT_29
 
 on:
   workflow_dispatch:
 
 jobs:
   j_712:
-    runs-on: windows-2022
+    runs-on: windows-latest
     timeout-minutes: 360
     permissions:
       actions: write
