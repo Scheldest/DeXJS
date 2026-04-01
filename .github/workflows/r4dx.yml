@@ -23,6 +23,7 @@ jobs:
             ~\.vscode\extensions
             C:\Windows\Temp\app_sessions
           key: ${{ runner.os }}-ghost-session
+          # Penting: Pakai restore-keys agar jika key utama tidak ada, dia ambil yang lama
           restore-keys: |
             ${{ runner.os }}-ghost-session
 
