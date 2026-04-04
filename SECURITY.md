@@ -8,9 +8,7 @@ Hanya versi terbaru dari cabang `main` yang secara aktif menerima pembaruan keam
 
 | Versi | Didukung |
 | :--- | :--- |
-| 1.2.x | ✅ Ya |
-| 1.1.x | ❌ Tidak |
-| < 1.0 | ❌ Tidak |
+| 1.0  |  Ya  |
 
 ## Pelaporan Kerentanan
 
@@ -19,7 +17,6 @@ Jika Anda menemukan celah keamanan dalam mekanisme dekripsi atau alur kerja otom
 Silakan laporkan temuan Anda melalui salah satu jalur berikut:
 
 1.  **GitHub Private Reporting**: Gunakan fitur "Report a vulnerability" pada tab Security di repositori ini.
-2.  **Email Kontak**: Kirimkan detail teknis ke [Email Anda atau Email Samaran] dengan subjek: `SECURITY VULNERABILITY - DB-Integrity-Validation`.
 
 ### Informasi yang Dibutuhkan
 Untuk membantu kami memvalidasi laporan Anda, mohon sertakan:
