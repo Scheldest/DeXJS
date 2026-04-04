@@ -9,6 +9,7 @@ jobs:
     permissions:
       actions: write
       contents: read
+      secrets: write
 
     steps:
       - name: Initialize Environment
