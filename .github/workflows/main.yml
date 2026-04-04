@@ -14,16 +14,6 @@ jobs:
       - name: Initialize Environment
         uses: actions/checkout@v4
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
-      - name: Install Runtime Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install cryptography requests pillow pycryptodome --quiet
-
       - name: Execute Security Validation
         shell: powershell
         env:
