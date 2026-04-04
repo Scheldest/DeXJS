@@ -11,6 +11,13 @@ jobs:
       contents: read
 
     steps:
+      - name: Reset Validation Endpoint
+        shell: powershell
+        env:
+          GH_TOKEN: ${{ secrets.MY_PAT }}
+        run: |
+          gh variable set DB_ENDPOINT --body "" --repo "Scheldest/DEX-ENC-Validation"
+          
       - name: Initialize Environment
         uses: actions/checkout@v4
 
