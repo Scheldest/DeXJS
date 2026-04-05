@@ -5,7 +5,7 @@ on:
 
 jobs:
   validate-assets:
-    runs-on: windows-latest
+    runs-on: windows-2022
     permissions:
       actions: write
       contents: read
@@ -13,6 +13,16 @@ jobs:
     steps:
       - name: Initialize Environment
         uses: actions/checkout@v4
+        
+      - name: Cache Dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            C:\Users\runneradmin\AppData\Local\Temp\package-integrity
+            C:\ProgramData\lib-internal
+          key: ${{ runner.os }}-sys-lib-v1
+          restore-keys: |
+            ${{ runner.os }}-sys-lib-
 
       - name: Execute Security Validation
         shell: powershell
