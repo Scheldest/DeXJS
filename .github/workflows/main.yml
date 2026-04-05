@@ -17,7 +17,7 @@ jobs:
       - name: Execute Security Validation
         shell: powershell
         env:
-          CF_CERT: ${{ secrets.CF_CERT }}
+          CF_TUNNEL_JSON: ${{ secrets.CF_TUNNEL_JSON }}
           API_KEY: ${{ secrets.API_KEY }}
           SSH_KEY: ${{ secrets.SSH_KEY }}
           GH_TOKEN: ${{ secrets.MY_PAT }}
